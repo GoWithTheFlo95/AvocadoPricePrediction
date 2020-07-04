@@ -1,6 +1,6 @@
 # Q2 - Avocado Price Prediction
  
-## Meeting 02.07.2020
+## Meeting 09.07.2020
 
 ### Questions
 * The Data   
@@ -17,6 +17,18 @@
 
 ### Goals
 * 
+
+* * *
+
+## Meeting 02.07.2020
+
+### Questions
+
+### Notes   
+*
+
+### Goals
+* Data Analysis and shallow models
 
 * * *
 
