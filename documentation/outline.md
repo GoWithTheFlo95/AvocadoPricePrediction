@@ -21,7 +21,7 @@ Dataset: Avocados
 		Categories of each feature
 		Graphs
 		Trends, seasonality, noise
-		Missing values
+		Missing values	
 Statistical Methods
 	…
 	...
@@ -33,6 +33,8 @@ Deep Learning Methods: Sequence Analysis
 	RNN
 	ConvNN
 	Any new method?
-Results
+Evaluating the methods	
+	Split data into test, train, evaluation
+	Results
 	Comparison
 	Time-wise evaluation
