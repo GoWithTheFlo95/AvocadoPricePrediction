@@ -23,12 +23,11 @@ Dataset: Avocados
 		Trends, seasonality, noise
 		Missing values	
 Statistical Methods
-	…
-	...
-Shallow Machine Learning approaches
 	Auto Regression
 		Univariate regression (time)
 		Vector regression (using multiple features)
+Shallow Machine Learning approaches
+	
 Deep Learning Methods: Sequence Analysis
 	RNN
 	ConvNN
