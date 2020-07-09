@@ -22,16 +22,19 @@ Dataset: Avocados
 		Graphs
 		Trends, seasonality, noise
 		Missing values	
-Statistical Methods
+Classic Statistical Methods
 	Auto Regression
 		Univariate regression (time)
 		Vector regression (using multiple features)
 Shallow Machine Learning approaches
-	
+	...
 Deep Learning Methods: Sequence Analysis
 	RNN
 	ConvNN
 	Any new method?
+Hyperparameters adjustment
+	manual
+	automatic
 Evaluating the methods	
 	Split data into test, train, evaluation
 	Results
