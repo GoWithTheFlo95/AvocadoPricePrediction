@@ -31,6 +31,7 @@ Shallow Machine Learning approaches
 Deep Learning Methods: Sequence Analysis
 	RNN
 	ConvNN
+	LTSM
 	Any new method?
 Hyperparameters adjustment
 	manual
