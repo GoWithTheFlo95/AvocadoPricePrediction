@@ -6,7 +6,7 @@ Author : Florian Hermes, HPI
 E-mail : florian.hermes@student.hpi.de
 Date   : 2020-07-02
 	
-	Data preprocessing.
+	Data analysis and preprocessing.
 """
 
 ## Initialize libraries and path variables
@@ -21,24 +21,40 @@ import matplotlib as plt
 ## Import dataset
 avocadoDat = pd.read_csv(home + '/avocado.csv')
 print(avocadoDat.head())
+print()
 
 ## Characteristics
-# types
-print(str(type(avocadoDat)))
+print('CHARACTERISTICS')
+print()
+
+print('Datatypes of features')
 print(str(avocadoDat.dtypes))
-print(avocadoDat.columns)
+print()
 
-# Size
-print(avocadoDat.size)
+print('Unique objects of feautre X')
+print(pd.unique(avocadoDat['region']))
+print('Number of unique objects of feautre X')
+print(avocadoDat['region'].nunique())
+print()
 
-# Input/ target output
-
-
-# dimensions
+print('Number of dimensions')
 print(avocadoDat.ndim)
+print('Dataset size')
 print(avocadoDat.shape)
+print()
 
-# conducted preprocessing
+# Feature inspection
+print('FEATURES')
+print(avocadoDat['AveragePrice'].describe())
+# or .max()/ .min()/ .mean()/ .std()/ .count()
+print()
+
+print('Features grouped by')
+groupedRegion = avocadoDat.groupby(['region'])
+print(groupedRegion['AveragePrice'].max())
+print()
 
 
-# datset splits
+## Plots
+groupedRegion_MaxAvgPrice = groupedRegion['AveragePrice'].max()
+groupedRegion_MaxAvgPrice.plot(kind='bar')
