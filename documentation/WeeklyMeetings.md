@@ -16,7 +16,10 @@
 *
 
 ### Goals
-* 
+* ARIMA model
+* SARIMA model
+
+* RNN (Recurrent Neural Network) and LSTN
 
 * * *
 
