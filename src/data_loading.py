@@ -20,7 +20,10 @@ home = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, home+'/../dataset')
 sys.path.insert(0, home+'/models')
 
+from sklearn.model_selection import train_test_split
 
+
+## get processed data
 def getData():
 	avocadoDat_unproc = pd.read_csv(home + '/../dataset/avocado.csv')
 
@@ -38,3 +41,25 @@ def getData():
 	avocadoDat = avocadoDat_proc
 
 	return avocadoDat
+
+
+## get dependet variable
+def depVar(dataset):
+	X = dataset.iloc[:,[0,2,3,4,5,6,7,8,9,10,11,12]]
+	return X
+
+
+## get independent variable
+def indepVar(dataset):
+	y = dataset.iloc[:,[1]]
+	return y
+
+
+## split dataset in train and test data
+def splitTrainTestDataset(dataset):
+	X = depVar(dataset)
+	y = indepVar(dataset)
+
+	X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0)
+
+	return X_train, X_test, y_train, y_test
