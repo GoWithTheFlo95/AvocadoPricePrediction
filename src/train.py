@@ -29,7 +29,7 @@ def train(dataset, n_epochs, optimizer, model, loss_function):
 
         inputs = features.view(1, 1, len(features))
 
-        output, hidden = model(inputs)
+        _, hidden = model(inputs)
 
         loss = loss_function(hidden, labels)
         loss.backward()
