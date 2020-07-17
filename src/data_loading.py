@@ -34,7 +34,12 @@ def getData():
 	# Date transformation
 	avocadoDat_proc['Date'] = pd.to_datetime(avocadoDat_proc['Date'])
 
+	# Set Date as an index
+	#avocadoDat_proc = avocadoDat_proc.set_index('Date')
+
 	# Final, pre-processed dataset
 	avocadoDat = avocadoDat_proc
+
+	# Ser 
 
 	return avocadoDat
