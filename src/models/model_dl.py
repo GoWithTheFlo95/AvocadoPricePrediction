@@ -26,7 +26,7 @@ from torch.autograd import Variable
 
 ## BaseModel
 class BaseModel(nn.Module):
-    def __init__(self, input_size, hidden_size, output_size, sequence_len, n_layer, cell, cuda=False):
+    def __init__(self, input_size, hidden_size, output_size, sequence_len, n_layer, cell):
 
         super(BaseModel, self).__init__()
         
@@ -42,7 +42,6 @@ class BaseModel(nn.Module):
         if cell == "LSTM":
             self.model = nn.LSTM(input_size = self.input_size, hidden_size = self.hidden_size, num_layers = self.n_layer, batch_first = True)
         
-        print(self.model)
         self.linear = nn.Linear(self.hidden_size, self.output_size)
 
     def init_hidden(self, batch_size):
@@ -51,45 +50,36 @@ class BaseModel(nn.Module):
 
 # RNNModel
 class RNNModel(BaseModel):
-    def __init__(self, input_size, hidden_size, output_size, sequence_len, n_layer, cell, cuda):
+    def __init__(self, input_size, hidden_size, output_size, sequence_len, n_layer, cell):
 
-        super(RNNModel, self).__init__(input_size, hidden_size, output_size, sequence_len, n_layer, cell, cuda)
+        super(RNNModel, self).__init__(input_size, hidden_size, output_size, sequence_len, n_layer, cell)
 
     def forward(self, input):
         batch_size = input.size(0)
         
         h0 = self.init_hidden(batch_size)
-
-        if self.cuda:
-            h0 = h0.cuda()
         
-        rnnOut, hn = self.model(input, h0)
-        hn = hn.view(batch_size, self.hidden_size)
+        rnnOut, _hn = self.model(input, h0)
 
-        linearOut = self.linear(hn)
+        rnnOut = self.linear(rnnOut[:, -1, :])
 
-        return linearOut
+        return rnnOut
 
 # LSTMModel
 class LSTMModel(BaseModel):
-    def __init__(self, input_size, hidden_size, output_size, sequence_len, n_layer, cell, cuda):
+    def __init__(self, input_size, hidden_size, output_size, sequence_len, n_layer, cell):
 
-        super(LSTMModel, self).__init__(input_size, hidden_size, output_size, sequence_len, n_layer, cell, cuda)
+        super(LSTMModel, self).__init__(input_size, hidden_size, output_size, sequence_len, n_layer, cell)
     
     def forward(self, input):
         batch_size = input.size(0)
 
         h0 = self.init_hidden(batch_size)
         c0 = self.init_hidden(batch_size)
-
-        if self.cuda:
-            h0 = h0.cuda()
-            c0 = c0.cuda()
         
-        lstmOut, hn = self.model(input, (h0, c0))
-        hn = hn[0].view(batch_size, self.hidden_size)
+        lstmOut, (_hn, _cn) = self.model(input, (h0, c0))
 
-        linearOut = self.linear(hn)
+        lstmOut = self.linear(lstmOut[:, -1, :])
 
-        return linearOut
+        return lstmOut
 
