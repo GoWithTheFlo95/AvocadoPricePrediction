@@ -37,10 +37,10 @@ class BaseModel(nn.Module):
         self.n_layer = n_layer                  # num of RNNs stacked on top of each other
 
         if cell == "RNN":
-            self.model = nn.RNN(input_size = self.input_size, hidden_size = self.hidden_size, num_layers = self.n_layer, batch_first = True)
+            self.model = nn.RNN(input_size = self.input_size, hidden_size = self.hidden_size, num_layers = self.n_layer) #atch_first = True)
         
         if cell == "LSTM":
-            self.model = nn.LSTM(input_size = self.input_size, hidden_size = self.hidden_size, num_layers = self.n_layer, batch_first = True)
+            self.model = nn.LSTM(input_size = self.input_size, hidden_size = self.hidden_size, num_layers = self.n_layer) #batch_first = True)
         
         self.linear = nn.Linear(self.hidden_size, self.output_size)
 
@@ -55,7 +55,7 @@ class RNNModel(BaseModel):
         super(RNNModel, self).__init__(input_size, hidden_size, output_size, sequence_len, n_layer, cell)
 
     def forward(self, input):
-        batch_size = input.size(0)
+        batch_size = input.shape[0]
         
         h0 = self.init_hidden(batch_size)
         
@@ -72,7 +72,7 @@ class LSTMModel(BaseModel):
         super(LSTMModel, self).__init__(input_size, hidden_size, output_size, sequence_len, n_layer, cell)
     
     def forward(self, input):
-        batch_size = input.size(0)
+        batch_size = input.shape[0]
 
         h0 = self.init_hidden(batch_size)
         c0 = self.init_hidden(batch_size)

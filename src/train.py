@@ -21,20 +21,24 @@ from data_loading import depVar, indepVar, splitTrainTestDataset
 
 
 def train(dataset, n_epochs, optimizer, model, loss_function):
-    
-    features, _, labels, _ = splitTrainTestDataset(dataset)
 
     for i in range(n_epochs):
-        optimizer.zero_grad()
 
-        inputs = features.view(1, 1, len(features))
+        for features, labels in dataset:
+            optimizer.zero_grad()
 
-        _, hidden = model(inputs)
+            inputs = features.values.reshape(1, 270, 1)
 
-        loss = loss_function(hidden, labels)
-        loss.backward()
+            print(inputs.ndim)
+            print(inputs.size)
+            print(inputs.shape[0])
 
-        optimizer.step()
+            _, hidden = model(inputs)
+
+            loss = loss_function(hidden, labels)
+            loss.backward()
+
+            optimizer.step()
 
         if i%10 == 0:
             print(f'epoch: {i:3} - loss: {loss.item():10.8f}')
@@ -42,3 +46,56 @@ def train(dataset, n_epochs, optimizer, model, loss_function):
     print(f'epoch: {i:3} - loss: {loss.item():10.8f}')
 
     return model
+
+
+# --------------------------------------------------------------------
+
+from data_loading import getData
+from model_dl import LSTMModel
+import torch.nn as nn
+import torch
+import math
+
+data = getData()
+
+data = data.drop(['TotalVol', 'SmallHass', 'LargeHass', 'XLargeHass', 'TotalBags', 'SmallBags', 'LargeBags', 'XLargeBags', 'type', 'year'], 1)
+data.info()
+
+#batch_size = data.shape[0] / data['region'].nunique()
+#print(batch_size)
+#print(18250/54)
+
+data = data.drop( data[data.region == 'WestTexNewMexico'].index )
+
+for i in range(data['region'].nunique()):
+    count = data.loc[data['region'] == data['region'].unique()[i], 'region'].count()
+    if count != 338:
+        print(data['region'].unique()[i])
+        print(count)
+
+# 338 timestemps for 53 regions with batch_size 1 and 1 feature
+train_seq = []
+test_seq = []
+#data_seq = []
+
+count = data.loc[data['region'] == data['region'].unique()[i], 'region'].count()
+count_train = math.floor(count * 0.8)
+
+for i in range(data['region'].nunique()):
+    features = data.loc[data['region'] == data['region'].unique()[i], 'Date']
+    label = data.loc[data['region'] == data['region'].unique()[i], 'AveragePrice']
+    train_seq.append((features[:count_train], label[:count_train]))
+    test_seq.append((features[count_train:], label[count_train:]))
+    #data_seq.append((features, label))
+
+#print(type(features))
+
+# initialize
+lr = 0.01
+n_epochs = 100
+
+lstm_model = LSTMModel(input_size=270, hidden_size=256, output_size=1, n_layer=1, sequence_len=1, cell = "LSTM")
+loss_function = nn.CrossEntropyLoss()
+optimizer = torch.optim.SGD(lstm_model.parameters(), lr=lr)
+
+train(train_seq, n_epochs, optimizer, lstm_model, loss_function)
