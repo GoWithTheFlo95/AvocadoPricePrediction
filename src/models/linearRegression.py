@@ -3,11 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 import datetime as dt
-import plotly.offline as py
-import plotly.graph_objs as go
-from plotly.offline import init_notebook_mode
 
-from plotly import tools
 
 
 dataset= pd.read_csv('e:/avocados/dl_q2_avocadopriceprediction/dataset/avocado.csv')#, parse_dates=["Date"])

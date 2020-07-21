@@ -1,0 +1,20 @@
+
+
+#print(os.listdir("../Avocado"))
+#data=pd.read_csv('G:/Avocado/avocado.csv',  encoding='latin-1', parse_dates=['Date'])
+
+#plt.rc('figure', figsize=(20, 8))
+#sns.set(font_scale=1.5)
+
+#data.sort_values(['Date', 'region'], inplace=True)
+#print(data.region.unique())
+#print(data.corr())
+
+#data = data.set_index('Date')
+#data = data.sort_values("Date")
+
+#data['month']=data['Date'].apply(lambda x:x.month)
+#data['day']=data['Date'].apply(lambda x:x.day)
+#data.month = data.month.values.astype(int)
+#data.day = data.day.values.astype(int)
+#data.drop(["Unnamed: 0"],axis=1,inplace=True)
