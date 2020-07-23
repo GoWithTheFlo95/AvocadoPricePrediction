@@ -28,6 +28,7 @@ def train(dataset, n_epochs, optimizer, model, loss_function):
             optimizer.zero_grad()
 
             inputs = features.values.reshape(1, 270, 1)
+            inputs = torch.Tensor(inputs)
 
             print(inputs.ndim)
             print(inputs.size)
@@ -58,7 +59,7 @@ import math
 
 data = getData()
 
-data = data.drop(['TotalVol', 'SmallHass', 'LargeHass', 'XLargeHass', 'TotalBags', 'SmallBags', 'LargeBags', 'XLargeBags', 'type', 'year'], 1)
+data = data.drop(['Date', 'SmallHass', 'LargeHass', 'XLargeHass', 'TotalBags', 'SmallBags', 'LargeBags', 'XLargeBags', 'type', 'year'], 1)
 data.info()
 
 #batch_size = data.shape[0] / data['region'].nunique()
@@ -82,19 +83,23 @@ count = data.loc[data['region'] == data['region'].unique()[i], 'region'].count()
 count_train = math.floor(count * 0.8)
 
 for i in range(data['region'].nunique()):
-    features = data.loc[data['region'] == data['region'].unique()[i], 'Date']
+    features = data.loc[data['region'] == data['region'].unique()[i], 'TotalVol']
     label = data.loc[data['region'] == data['region'].unique()[i], 'AveragePrice']
     train_seq.append((features[:count_train], label[:count_train]))
     test_seq.append((features[count_train:], label[count_train:]))
     #data_seq.append((features, label))
 
+
+print(features)
+
 #print(type(features))
 
 # initialize
+print('INITIALIZATION')
 lr = 0.01
 n_epochs = 100
 
-lstm_model = LSTMModel(input_size=270, hidden_size=256, output_size=1, n_layer=1, sequence_len=1, cell = "LSTM")
+lstm_model = LSTMModel(input_size=1, hidden_size=1, output_size=1, n_layer=1, sequence_len=1, cell = "LSTM")
 loss_function = nn.CrossEntropyLoss()
 optimizer = torch.optim.SGD(lstm_model.parameters(), lr=lr)
 
