@@ -22,6 +22,28 @@ sys.path.insert(0, home+'/models')
 
 from sklearn.model_selection import train_test_split
 
+## get processed data
+def getDataForRegression():
+	avocadoDat_unproc = pd.read_csv(home + '/../dataset/avocado.csv')
+
+	## Data preprocessing
+	# Removing unnecessary features
+	avocadoDat_proc = avocadoDat_unproc.iloc[:,[1,2]]
+	print(avocadoDat_proc.head())
+
+	# Date transformation
+	avocadoDat_proc['Date'] = pd.to_datetime(avocadoDat_proc['Date'])
+
+	# Set Date as an index
+	#avocadoDat_proc = avocadoDat_proc.set_index('Date')
+	#print(avocadoDat_proc.head())
+
+	# Final, pre-processed dataset
+	avocadoDat = avocadoDat_proc
+
+	# Ser 
+
+	return avocadoDat
 
 ## get processed data
 def getData():
@@ -38,7 +60,7 @@ def getData():
 	avocadoDat_proc['Date'] = pd.to_datetime(avocadoDat_proc['Date'])
 
 	# Set Date as an index
-	#avocadoDat_proc = avocadoDat_proc.set_index('Date')
+	avocadoDat_proc = avocadoDat_proc.set_index('Date')
 
 	# Final, pre-processed dataset
 	avocadoDat = avocadoDat_proc

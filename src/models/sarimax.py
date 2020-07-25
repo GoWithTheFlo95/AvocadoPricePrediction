@@ -19,18 +19,6 @@ currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentfram
 parentdir = os.path.dirname(currentdir)
 sys.path.insert(0,parentdir) 
 
-import data_loading as dl
-
-data=dl.getData() 
-
-
-data = data.drop(columns = ['TotalVol','TotalBags','year','SmallHass','LargeHass','XLargeHass','SmallBags','LargeBags','XLargeBags'])
-
-data = data.set_index('Date')
-data = data.resample('W').sum()
-print(data.head())
-
-#sns.lineplot('Date','AveragePrice',hue = 'year',data = data,)
 
 def test_stationarity(timeseries):
     #Determing rolling statistics
@@ -71,7 +59,83 @@ def tsplot(y, lags=None, figsize=(12, 7), style='bmh'):
         smt.graphics.plot_acf(y, lags=lags, ax=acf_ax)
         smt.graphics.plot_pacf(y, lags=lags, ax=pacf_ax)
         plt.tight_layout()
+#-------------------------------------------
 
+import data_loading as dl
 
+data=dl.getData() 
 
+plt.figure(figsize=(15,5))
+#figsize=(12, 7)
+
+data = data.drop(columns = ['TotalVol','TotalBags','year','SmallHass','LargeHass','XLargeHass','SmallBags','LargeBags','XLargeBags'])
+data = data.set_index('Date')
+print(data.head())
+newData=data.drop(columns=['type','region'])
+#print(newData.head())
+#plt.plot(newData)
 #plt.show()
+
+data = data.resample('W').sum()
+print(data.head())
+plt.plot(data)
+
+
+#sns.lineplot('Date','AveragePrice',hue = 'year',data = data,)
+test_stationarity(data['AveragePrice'])
+
+dec = sm.tsa.seasonal_decompose(data['AveragePrice'],period = 52).plot()
+plt.show()
+#P-VALUE < 0.05
+#TEST STATISTIC < CRITICAL VALUE
+#THE MOVING AVERAGE OF THE DATA IS ALSO NEARLY 0 AND ROTATES AROUND 0
+
+#Data has trend and seasonality. It is not stationary so we use differencing to make it so
+data_diff = data['AveragePrice'].diff() # To find the discrete difference 
+data_diff = data_diff.dropna() #drop null values
+dec = sm.tsa.seasonal_decompose(data_diff,period = 52).plot()
+
+test_stationarity(data_diff)
+
+tsplot(data_diff)
+
+#######################################ARIMA#######################################################
+#p: The number of lag observations included in the model, also called the lag order.
+#d: The number of times that the raw observations are differenced, also called the degree of differencing.
+#q: The size of the moving average window, also called the order of moving average.
+
+model = ARIMA(data['AveragePrice'],order = (0,1,0))
+model_fit = model.fit()
+print(model_fit.summary())
+
+data['FORECAST'] = model_fit.predict(start = 130,end = 170,dynamic = True)
+data[['AveragePrice','FORECAST']].plot(figsize = (10,6))
+
+exp = [data.iloc[i,0] for i in range(130,len(data))]
+pred = [data.iloc[i,1] for i in range(130,len(data))]
+data = data.drop(columns = 'FORECAST')
+error = mean_absolute_error(exp,pred)
+print(error)
+
+#Sarima
+data_diff_seas = data_diff.diff(52)
+data_diff_seas = data_diff_seas.dropna()
+dec = sm.tsa.seasonal_decompose(data_diff_seas,period = 52).plot()
+
+tsplot(data_diff_seas)
+
+model = sm.tsa.statespace.SARIMAX(data['AveragePrice'],order = (0,1,0),seasonal_order = (1,1,0,52))
+results = model.fit()
+print(results.summary())
+
+data['Forecast'] = results.predict(start = 130,end = 169,dynamic = True)
+data[['AveragePrice','Forecast']].plot(figsize = (12,8))
+
+exp = [data.iloc[i,0] for i in range(130,len(data))]
+pred = [data.iloc[i,1] for i in range(130,len(data))]
+
+error = mean_absolute_error(exp,pred)
+print(error)
+
+
+plt.show()

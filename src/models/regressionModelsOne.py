@@ -22,17 +22,19 @@ home = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, home+'/../../dataset')
 sys.path.insert(0, home+'/../')
 
-from data_loading import getDataAllFeatures
+#from data_loading import getDataAllFeatures
+from data_loading import getDataForRegression, depVar, indepVar
 
-
-
-data=getDataAllFeatures()
+data=getDataForRegression()
 print(data)
 
-# OLS Analysis
-exog = data.iloc[:,1:].values   #creates a 1D vector of the data
-print(exog)
-endog = data.iloc[:,[0]].values
+#--------------------------------OLS Analysis---------------------------------------
+import datetime as dt
+
+exog = data.iloc[:,1].values    # Y creates a 1D vector of the dependent variable
+#print(exog)
+endog = data.iloc[:,0].map(dt.datetime.toordinal).values   # X the regressor variables, in this case only date ???
+
 print(endog)
 r_ols = sm.OLS(endog,exog) 
 r= r_ols.fit()
