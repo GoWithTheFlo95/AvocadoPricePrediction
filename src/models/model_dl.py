@@ -36,11 +36,13 @@ class BaseModel(nn.Module):
         self.sequence_len = sequence_len        # length of a sequence
         self.n_layer = n_layer                  # num of RNNs stacked on top of each other
 
+        batch_first = True
+
         if cell == "RNN":
-            self.model = nn.RNN(input_size = self.input_size, hidden_size = self.hidden_size, num_layers = self.n_layer) #atch_first = True)
+            self.model = nn.RNN(input_size = self.input_size, hidden_size = self.hidden_size, num_layers = self.n_layer, batch_first=batch_first) #atch_first = True)
         
         if cell == "LSTM":
-            self.model = nn.LSTM(input_size = self.input_size, hidden_size = self.hidden_size, num_layers = self.n_layer) #batch_first = True)
+            self.model = nn.LSTM(input_size = self.input_size, hidden_size = self.hidden_size, num_layers = self.n_layer, batch_first=batch_first) #batch_first = True)
         
         self.linear = nn.Linear(self.hidden_size, self.output_size)
 

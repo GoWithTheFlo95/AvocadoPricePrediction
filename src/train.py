@@ -27,7 +27,7 @@ def train(dataset, n_epochs, optimizer, model, loss_function):
         for features, labels in dataset:
             optimizer.zero_grad()
 
-            inputs = features.values.reshape(1, 270, 1)
+            inputs = features.values.reshape(1, -1, 1)
             inputs = torch.Tensor(inputs)
 
             print(inputs.ndim)
@@ -60,7 +60,8 @@ import math
 data = getData()
 
 data = data.drop(['Date', 'SmallHass', 'LargeHass', 'XLargeHass', 'TotalBags', 'SmallBags', 'LargeBags', 'XLargeBags', 'type', 'year'], 1)
-data.info()
+data = data.loc[:, 'AveragePrice']
+print(data)
 
 #batch_size = data.shape[0] / data['region'].nunique()
 #print(batch_size)
@@ -79,16 +80,19 @@ train_seq = []
 test_seq = []
 #data_seq = []
 
-count = data.loc[data['region'] == data['region'].unique()[i], 'region'].count()
+count = 338 #data.loc[data['region'] == data['region'].unique()[i], 'region'].count()
 count_train = math.floor(count * 0.8)
+slide_win = 52
+#label_index = slide_win+1
 
 for i in range(data['region'].nunique()):
-    features = data.loc[data['region'] == data['region'].unique()[i], 'TotalVol']
+    features = data.loc[data['region'] == data['region'].unique()[i], 'AveragePrice']
     label = data.loc[data['region'] == data['region'].unique()[i], 'AveragePrice']
     train_seq.append((features[:count_train], label[:count_train]))
     test_seq.append((features[count_train:], label[count_train:]))
     #data_seq.append((features, label))
 
+# 52 week for timetemps
 
 print(features)
 
@@ -99,8 +103,13 @@ print('INITIALIZATION')
 lr = 0.01
 n_epochs = 100
 
-lstm_model = LSTMModel(input_size=1, hidden_size=1, output_size=1, n_layer=1, sequence_len=1, cell = "LSTM")
-loss_function = nn.CrossEntropyLoss()
-optimizer = torch.optim.SGD(lstm_model.parameters(), lr=lr)
+lstm_model = LSTMModel(input_size=1, hidden_size=50, output_size=1, n_layer=1, sequence_len=1, cell = "LSTM")
+loss_function = nn.MSELoss() # or L1 loss           #CrossEntropy for Categories
+optimizer = torch.optim.Adam(lstm_model.parameters(), lr=lr)
 
 train(train_seq, n_epochs, optimizer, lstm_model, loss_function)
+
+
+# 1. slidig window just for totalUS
+#    use all regions -> (52,2) seq_len=52
+# 2. include region either nn.Embedding with string or binary encoded beforehand
