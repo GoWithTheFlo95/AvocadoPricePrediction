@@ -20,18 +20,24 @@ sys.path.insert(0, home+'/models/')
 from data_loading import depVar, indepVar, splitTrainTestDataset
 
 
-def train(dataset, n_epochs, optimizer, model, loss_function):
+def train(dataset, n_epochs, optimizer, model, loss_function, device):
+
+    model = model.to(device)
 
     for i in range(n_epochs):
 
         for features, labels in dataset:
+
             optimizer.zero_grad()
 
             inputs = features.reshape(1, -1, 1)
+            inputs = inputs.to(device)
 
-            hidden = model(inputs)
+            out = model(inputs)
+            out = out.to(device)
+            labels = labels.to(device)
 
-            loss = loss_function(hidden, labels)
+            loss = loss_function(out, labels)
             loss.backward()
 
             optimizer.step()
@@ -52,6 +58,8 @@ import torch.nn as nn
 import torch
 import math
 
+print('START')
+
 data = getData()
 
 data = data.drop(['Date', 'TotalVol', 'SmallHass', 'LargeHass', 'XLargeHass', 'TotalBags', 'SmallBags', 'LargeBags', 'XLargeBags', 'type', 'year'], 1)
@@ -66,10 +74,15 @@ n_epochs = 100
 hidden_size = 50
 slide_win = 52
 
-lstm_model = LSTMModel(input_size=1, hidden_size=hidden_size, output_size=1, n_layer=1, sequence_len=1, cell = "LSTM")
-loss_function = nn.MSELoss() # or L1 loss           #CrossEntropy for Categories
-optimizer = torch.optim.Adam(lstm_model.parameters(), lr=lr)
+is_cuda = torch.cuda.is_available()
 
+# If we have a GPU available, we'll set our device to GPU. We'll use this device variable later in our code.
+if is_cuda:
+    device = torch.device("cuda")
+    print("GPU")
+else:
+    device = torch.device("cpu")
+    print("CPU")
 
 # Dataset preparation
 # 338 timestemps for 53 regions with batch_size 1 and 1 feature
@@ -90,11 +103,12 @@ for i in range(data['region'].nunique()):
         label = avgPofReg[i+slide_win:i+slide_win+1]
         train_seq.append((features, label))
 
-print(type(features))
-print(len(features))
-print(len(label))
+print('START TRAINING')
+lstm_model = LSTMModel(input_size=1, hidden_size=hidden_size, output_size=1, n_layer=1, sequence_len=1, cell = "LSTM")
+loss_function = nn.L1Loss() # or L1 loss           #CrossEntropy for Categories
+optimizer = torch.optim.Adam(lstm_model.parameters(), lr=lr)
 
-#train(train_seq, n_epochs, optimizer, lstm_model, loss_function)
+train(train_seq, n_epochs, optimizer, lstm_model, loss_function, device)
 
 
 # 1. slidig window just for totalUS
