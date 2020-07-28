@@ -35,6 +35,7 @@ class BaseModel(nn.Module):
         self.output_size = output_size          # size of a output element
         self.sequence_len = sequence_len        # length of a sequence
         self.n_layer = n_layer                  # num of RNNs stacked on top of each other
+        self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
         batch_first = True
 
@@ -48,6 +49,7 @@ class BaseModel(nn.Module):
 
     def init_hidden(self, batch_size):
         hidden = Variable(torch.zeros(self.n_layer * 1, batch_size, self.hidden_size))
+        hidden=hidden.to(device)
         return hidden
 
 # RNNModel
