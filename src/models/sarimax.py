@@ -127,6 +127,7 @@ error = mean_absolute_error(exp,pred)
 print(error)
 
 #---------------------Sarimax-------------------------------------------------------------
+
 data_diff_seas = data_diff.diff(52)
 data_diff_seas = data_diff_seas.dropna()
 dec = sm.tsa.seasonal_decompose(data_diff_seas,period = 52).plot()
