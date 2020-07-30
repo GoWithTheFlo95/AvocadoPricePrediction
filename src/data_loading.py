@@ -4,7 +4,7 @@
 """
 Author : Florian Hermes, HPI
 E-mail : florian.hermes@student.hpi.de
-Date   : 2020-07-13
+Date   : 2020-07-30
 	
 	Load data, perform pre-processing and provide interface.
 	
@@ -22,6 +22,8 @@ sys.path.insert(0, home+'/models')
 
 from sklearn.model_selection import train_test_split
 
+
+
 ## get processed data
 def getDataForRegression():
 	avocadoDat_unproc = pd.read_csv(home + '/../dataset/avocado.csv')
@@ -29,7 +31,7 @@ def getDataForRegression():
 	## Data preprocessing
 	# Removing unnecessary features
 	avocadoDat_proc = avocadoDat_unproc.iloc[:,[1,2]]
-	print(avocadoDat_proc.head())
+	#print(avocadoDat_proc.head())
 
 	# Date transformation
 	avocadoDat_proc['Date'] = pd.to_datetime(avocadoDat_proc['Date'])
@@ -40,7 +42,7 @@ def getDataForRegression():
 
 	# Final, pre-processed dataset
 	avocadoDat = avocadoDat_proc
-
+	avocadoDat.sort_values(['Date'], inplace=True)
 	# Ser 
 
 	return avocadoDat
@@ -60,7 +62,7 @@ def getData():
 	avocadoDat_proc['Date'] = pd.to_datetime(avocadoDat_proc['Date'])
 
 	# Set Date as an index
-	avocadoDat_proc = avocadoDat_proc.set_index('Date')
+	#avocadoDat_proc = avocadoDat_proc.set_index('Date')
 
 	# Final, pre-processed dataset
 	avocadoDat = avocadoDat_proc
@@ -109,14 +111,14 @@ def getDataAllFeatures():
 
 	return avocadoDat
 
-## get dependet variable
-def depVar(dataset):
+## get independet variable
+def indepVar(dataset):
 	X = dataset.iloc[:,[0,2,3,4,5,6,7,8,9,10,11,12]]
 	return X
 
 
-## get independent variable
-def indepVar(dataset):
+## get dependent variable
+def depVar(dataset):
 	y = dataset.iloc[:,[1]]
 	return y
 
