@@ -1,6 +1,5 @@
 Outline:
 
-
 What’s a time series?
 	Definition
     Features (seasonality, trends, noise, autocorrelation, etc)
