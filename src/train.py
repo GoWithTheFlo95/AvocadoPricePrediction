@@ -26,15 +26,17 @@ def train(dataset, n_epochs, optimizer, model, loss_function, device):
 
     for i in range(n_epochs):
 
-        for features, labels in dataset:
+        for sequences, labels in dataset:
 
             optimizer.zero_grad()
 
-            inputs = features.reshape(1, -1, 1)
+            inputs = sequences.reshape(1, -1, 1)
             inputs = inputs.to(device)
 
             out = model(inputs)
             out = out.to(device)
+
+            labels = labels.reshape(1, 1)
             labels = labels.to(device)
 
             loss = loss_function(out, labels)
@@ -99,18 +101,16 @@ for i in range(data['region'].nunique()):
     avgPofReg = torch.Tensor(avgPofReg)
 
     for j in range(count_train - slide_win):
-        features = avgPofReg[j:j+slide_win]
+        sequences = avgPofReg[j:j+slide_win]
         label = avgPofReg[i+slide_win:i+slide_win+1]
-        train_seq.append((features, label))
+        train_seq.append((sequences, label))
 
 print('START TRAINING')
 lstm_model = LSTMModel(input_size=1, hidden_size=hidden_size, output_size=1, n_layer=1, sequence_len=1, cell = "LSTM")
-loss_function = nn.L1Loss() # or L1 loss           #CrossEntropy for Categories
+loss_function = nn.MSELoss() # or L1 loss           #CrossEntropy for Categories
 optimizer = torch.optim.Adam(lstm_model.parameters(), lr=lr)
 
 train(train_seq, n_epochs, optimizer, lstm_model, loss_function, device)
 
 
-# 1. slidig window just for totalUS
-#    use all regions -> (52,2) seq_len=52
 # 2. include region either nn.Embedding with string or binary encoded beforehand
