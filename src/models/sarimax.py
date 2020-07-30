@@ -19,6 +19,10 @@ currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentfram
 parentdir = os.path.dirname(currentdir)
 sys.path.insert(0,parentdir) 
 
+import data_loading as dl
+
+
+#-----------------Some useful functions-----------------------------------------------
 
 def test_stationarity(timeseries):
     #Determing rolling statistics
@@ -59,15 +63,15 @@ def tsplot(y, lags=None, figsize=(12, 7), style='bmh'):
         smt.graphics.plot_acf(y, lags=lags, ax=acf_ax)
         smt.graphics.plot_pacf(y, lags=lags, ax=pacf_ax)
         plt.tight_layout()
-#-------------------------------------------
+#-----------------------------------------------------------------------------------------------------
 
-import data_loading as dl
-
+#############################Processing the data###################################################
 data=dl.getData() 
 
 plt.figure(figsize=(15,5))
 #figsize=(12, 7)
 
+#dropping columns except for date and average price
 data = data.drop(columns = ['TotalVol','TotalBags','year','SmallHass','LargeHass','XLargeHass','SmallBags','LargeBags','XLargeBags'])
 data = data.set_index('Date')
 print(data.head())
@@ -76,20 +80,25 @@ newData=data.drop(columns=['type','region'])
 #plt.plot(newData)
 #plt.show()
 
+
+#---------------------group data by weeks----------------------------------------
 data = data.resample('W').sum()
 print(data.head())
 plt.plot(data)
 
-
+#---------------------doing some plots-------------------------------------------
 #sns.lineplot('Date','AveragePrice',hue = 'year',data = data,)
 test_stationarity(data['AveragePrice'])
 
+
+#---------------------decompose data to trend, noise, seasonality----------------
 dec = sm.tsa.seasonal_decompose(data['AveragePrice'],period = 52).plot()
 plt.show()
-#P-VALUE < 0.05
-#TEST STATISTIC < CRITICAL VALUE
-#THE MOVING AVERAGE OF THE DATA IS ALSO NEARLY 0 AND ROTATES AROUND 0
+#p-value < 0.05
+#test statistic < critical value
+#the moving average of the data is also nearly 0 and rotates around 0
 
+#---------------------differencing to one degree---------------------------------
 #Data has trend and seasonality. It is not stationary so we use differencing to make it so
 data_diff = data['AveragePrice'].diff() # To find the discrete difference 
 data_diff = data_diff.dropna() #drop null values
@@ -99,7 +108,7 @@ test_stationarity(data_diff)
 
 tsplot(data_diff)
 
-#######################################ARIMA#######################################################
+###################################ARIMA and SARIMA#######################################################
 #p: The number of lag observations included in the model, also called the lag order.
 #d: The number of times that the raw observations are differenced, also called the degree of differencing.
 #q: The size of the moving average window, also called the order of moving average.
@@ -117,7 +126,7 @@ data = data.drop(columns = 'FORECAST')
 error = mean_absolute_error(exp,pred)
 print(error)
 
-#Sarima
+#---------------------Sarimax-------------------------------------------------------------
 data_diff_seas = data_diff.diff(52)
 data_diff_seas = data_diff_seas.dropna()
 dec = sm.tsa.seasonal_decompose(data_diff_seas,period = 52).plot()
